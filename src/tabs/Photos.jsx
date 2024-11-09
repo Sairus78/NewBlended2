@@ -1,5 +1,6 @@
 import { getPhotos } from 'apiService/photos';
 import { Button, Form, Loader, PhotosGallery, Text } from 'components';
+import ImageModal from 'components/ImageModal/ImageModal';
 import { useEffect, useState } from 'react';
 
 export const Photos = () => {
@@ -10,6 +11,10 @@ export const Photos = () => {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false)
+  const [altModal, setModalAlt] = useState('');
+  const [srcModal, setModalSrc] = useState('');
+
   useEffect(() => {
     if (!query) {
       return;
@@ -41,16 +46,31 @@ return setIsEmpty(true);
   };
   const handleLoad = () => {
     setPage((prevPage) => prevPage + 1)
-  } 
+  }
+
+  const openModal = (srcInner, altInner) => {
+    setModalIsOpen(true)
+    setModalAlt(altInner);
+    setModalSrc(srcInner);
+  }
+
+  const closeModal = () => {
+    setModalIsOpen(false)
+    setModalAlt('');
+    setModalSrc('');
+  }
+
+
   return (
     <>
       <Form onSubmit={handlSubmit} />
-      {images.length > 0 && <PhotosGallery images={images}/>}
+      {images.length > 0 && <PhotosGallery openModal={openModal} images={images}/>}
       {isVisible && !isLoading && images.length > 0 && <Button onClick={handleLoad} disabled={isLoading}>{isLoading ? 'Loading':'LoadMore'} </Button>}
       {!images.length && !isEmpty && <Text textAlign="center">Let`s begin search 🔎</Text>}
       {isLoading && <Loader />}
       {error && <Text textAlign="center">❌ Something went wrong - {error}</Text>}
       {isEmpty && <Text textAlign="center"> Sorry.There are no images ... 😭</Text>}
+      <ImageModal modalIsOpen={modalIsOpen} closeModal={closeModal} src={srcModal} alt={altModal}/>
     </>
   );
 };
